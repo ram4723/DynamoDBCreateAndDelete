@@ -1,0 +1,13 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "InputApi"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1drcs4tz5df3b"
+s3_prefix = "InputApi"
+region = "us-east-1"
+profile = "ck-deploy"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+image_repositories = []

@@ -1,0 +1,53 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.7.10'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation ("org.jetbrains.kotlin:kotlin-test")
+    implementation("com.amazonaws:aws-lambda-java-events:3.11.0")
+    implementation ("com.google.code.gson:gson:2.8.2")
+    implementation("software.amazon.awssdk:sqs:2.17.219")
+    implementation("com.amazonaws:aws-lambda-java-core:1.2.1")
+    implementation("com.google.code.gson:gson:2.9.0")
+    implementation("com.amazonaws:aws-java-sdk-dynamodb:1.12.248")
+    implementation ("com.googlecode.json-simple:json-simple:1.1")
+    implementation("com.amazonaws:aws-java-sdk-dynamodb:1.12.267")
+
+// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-sqs
+    implementation("com.amazonaws:aws-java-sdk-sqs:1.12.268")
+
+
+
+    implementation ("org.json:json:20220320")
+
+    implementation ("com.amazonaws:aws-lambda-java-events:2.2.9")
+
+
+}
+test {
+    useJUnitPlatform()
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = '1.8'
+}
+task buildZip(type: Zip) {
+    from compileJava
+    from compileKotlin
+    from processResources
+    into('lib') {
+        from configurations.runtimeClasspath
+    }
+}
+build.dependsOn buildZip

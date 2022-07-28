@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Resources:
+  BackgroundWorkerRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSQSFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - arn:aws:iam::aws:policy/CloudWatchFullAccess
+        - arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+        - arn:aws:iam::aws:policy/AmazonVPCFullAccess
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole
+
+  LambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: java8
+      Role: !GetAtt BackgroundWorkerRole.Arn
+      Handler: LambdaApi123::handleRequest
+      Timeout: 300
+      MemorySize: 512
+      CodeUri: build/distributions/Task4-1.0-SNAPSHOT.zip
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /Map
+            Method: post
+
+  ApiDataTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: ApiDataTable123
+      AttributeDefinitions:
+        - AttributeName: Name
+          AttributeType: S
+        - AttributeName: Phone
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Phone
+          KeyType: HASH
+        - AttributeName: Name
+          KeyType: RANGE
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+  LambdaFunction1:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: java8
+      Role: !GetAtt BackgroundWorkerRole.Arn
+      Handler: LambdaApi124::handleRequest
+      Timeout: 300
+      MemorySize: 512
+      CodeUri: build/distributions/Task4-1.0-SNAPSHOT.zip
+      Events:
+        SQSEVENT:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt MySqsQueue.Arn
+            BatchSize: 10
+
+  MySqsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: DataApi123
+      VisibilityTimeout: 300
+
+
+
+
